@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RestaurantOrder.API/RestaurantOrder.API.csproj" />
+    <Project Path="src/RestaurantOrder.Application/RestaurantOrder.Application.csproj" />
+    <Project Path="src/RestaurantOrder.Domain/RestaurantOrder.Domain.csproj" />
+    <Project Path="src/RestaurantOrder.Infrastructure/RestaurantOrder.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RestaurantOrder.IntegrationTests/RestaurantOrder.IntegrationTests.csproj" />
+    <Project Path="tests/RestaurantOrder.UnitTests/RestaurantOrder.UnitTests.csproj" />
+  </Folder>
+</Solution>
