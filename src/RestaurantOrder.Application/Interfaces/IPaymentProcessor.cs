@@ -1,0 +1,9 @@
+using RestaurantOrder.Domain.Enums;
+
+namespace RestaurantOrder.Application.Interfaces;
+
+public interface IPaymentProcessor
+{
+    PaymentMethod SupportedMethod { get; }
+    Task<string> ProcessAsync(decimal amount, CancellationToken ct = default);
+}
