@@ -5,6 +5,7 @@ using RestaurantOrder.API.Middleware;
 using RestaurantOrder.Application;
 using RestaurantOrder.Infrastructure;
 using RestaurantOrder.Infrastructure.Persistence;
+using Scalar.AspNetCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,7 +41,10 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpMetrics();
 
 if (app.Environment.IsDevelopment())
+{
     app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 app.MapControllers();
 app.MapMetrics();
