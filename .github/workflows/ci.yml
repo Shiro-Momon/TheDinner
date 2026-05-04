@@ -33,7 +33,7 @@ jobs:
         run: dotnet test tests/RestaurantOrder.IntegrationTests --configuration Release --no-build --collect:"XPlat Code Coverage"
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-reports
           path: "**/coverage.cobertura.xml"
