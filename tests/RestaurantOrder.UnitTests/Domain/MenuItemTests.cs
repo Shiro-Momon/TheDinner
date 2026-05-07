@@ -16,7 +16,6 @@ public class MenuItemTests
         item.Price.Should().Be(12.50m);
         item.Category.Should().Be(MenuItemCategory.MainCourse);
         item.IsAvailable.Should().BeTrue();
-        item.Id.Should().NotBeEmpty();
     }
 
     [Theory]

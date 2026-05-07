@@ -11,6 +11,6 @@ public class PaymentRepository : Repository<Payment>, IPaymentRepository
     {
     }
 
-    public async Task<Payment?> GetByOrderIdAsync(Guid orderId, CancellationToken ct = default) =>
+    public async Task<Payment?> GetByOrderIdAsync(int orderId, CancellationToken ct = default) =>
         await DbSet.FirstOrDefaultAsync(p => p.OrderId == orderId, ct);
 }

@@ -1,6 +1,6 @@
 namespace RestaurantOrder.Domain.Events;
 
 public sealed record OrderConfirmedEvent(
-    Guid OrderId,
-    Guid TableId,
+    int OrderId,
+    int TableId,
     DateTimeOffset OccurredAt) : IDomainEvent;

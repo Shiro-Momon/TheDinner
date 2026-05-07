@@ -32,7 +32,7 @@ public class OrderService
         return orders.Select(MapToDto).ToList();
     }
 
-    public async Task<OrderResponseDto> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<OrderResponseDto> GetByIdAsync(int id, CancellationToken ct = default)
     {
         var order = await _orderRepository.GetWithItemsAsync(id, ct)
             ?? throw new DomainException($"Order '{id}' not found.");
@@ -58,7 +58,7 @@ public class OrderService
         return MapToDto(order);
     }
 
-    public async Task<OrderResponseDto> AddItemAsync(Guid orderId, AddOrderItemDto dto, CancellationToken ct = default)
+    public async Task<OrderResponseDto> AddItemAsync(int orderId, AddOrderItemDto dto, CancellationToken ct = default)
     {
         var order = await _orderRepository.GetWithItemsAsync(orderId, ct)
             ?? throw new DomainException($"Order '{orderId}' not found.");
@@ -74,7 +74,7 @@ public class OrderService
         return MapToDto(order);
     }
 
-    public async Task<OrderResponseDto> RemoveItemAsync(Guid orderId, Guid menuItemId, CancellationToken ct = default)
+    public async Task<OrderResponseDto> RemoveItemAsync(int orderId, int menuItemId, CancellationToken ct = default)
     {
         var order = await _orderRepository.GetWithItemsAsync(orderId, ct)
             ?? throw new DomainException($"Order '{orderId}' not found.");
@@ -84,22 +84,22 @@ public class OrderService
         return MapToDto(order);
     }
 
-    public async Task<OrderResponseDto> ConfirmAsync(Guid id, CancellationToken ct = default) =>
+    public async Task<OrderResponseDto> ConfirmAsync(int id, CancellationToken ct = default) =>
         await TransitionAsync(id, o => o.Confirm(), ct);
 
-    public async Task<OrderResponseDto> StartPreparingAsync(Guid id, CancellationToken ct = default) =>
+    public async Task<OrderResponseDto> StartPreparingAsync(int id, CancellationToken ct = default) =>
         await TransitionAsync(id, o => o.StartPreparing(), ct);
 
-    public async Task<OrderResponseDto> MarkReadyAsync(Guid id, CancellationToken ct = default) =>
+    public async Task<OrderResponseDto> MarkReadyAsync(int id, CancellationToken ct = default) =>
         await TransitionAsync(id, o => o.MarkReady(), ct);
 
-    public async Task<OrderResponseDto> ServeAsync(Guid id, CancellationToken ct = default) =>
+    public async Task<OrderResponseDto> ServeAsync(int id, CancellationToken ct = default) =>
         await TransitionAsync(id, o => o.Serve(), ct);
 
-    public async Task<OrderResponseDto> CancelAsync(Guid id, CancellationToken ct = default) =>
+    public async Task<OrderResponseDto> CancelAsync(int id, CancellationToken ct = default) =>
         await TransitionAsync(id, o => o.Cancel(), ct);
 
-    private async Task<OrderResponseDto> TransitionAsync(Guid id, Action<Order> transition, CancellationToken ct)
+    private async Task<OrderResponseDto> TransitionAsync(int id, Action<Order> transition, CancellationToken ct)
     {
         var order = await _orderRepository.GetWithItemsAsync(id, ct)
             ?? throw new DomainException($"Order '{id}' not found.");

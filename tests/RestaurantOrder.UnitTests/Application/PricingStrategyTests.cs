@@ -7,8 +7,8 @@ namespace RestaurantOrder.UnitTests.Application;
 public class PricingStrategyTests
 {
     private static IReadOnlyList<OrderItem> MakeItems(int count, decimal unitPrice) =>
-        Enumerable.Range(0, count)
-            .Select(_ => OrderItem.Create(Guid.NewGuid(), 1, unitPrice))
+        Enumerable.Range(1, count)
+            .Select(i => OrderItem.Create(i, 1, unitPrice))
             .ToList();
 
     [Fact]

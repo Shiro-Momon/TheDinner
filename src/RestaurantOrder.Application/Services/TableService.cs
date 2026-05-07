@@ -20,7 +20,7 @@ public class TableService
         return tables.Select(MapToDto).ToList();
     }
 
-    public async Task<TableResponseDto> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<TableResponseDto> GetByIdAsync(int id, CancellationToken ct = default)
     {
         var table = await _repository.GetByIdAsync(id, ct)
             ?? throw new DomainException($"Table '{id}' not found.");
@@ -34,7 +34,7 @@ public class TableService
         return MapToDto(table);
     }
 
-    public async Task<TableResponseDto> OccupyAsync(Guid id, CancellationToken ct = default)
+    public async Task<TableResponseDto> OccupyAsync(int id, CancellationToken ct = default)
     {
         var table = await _repository.GetByIdAsync(id, ct)
             ?? throw new DomainException($"Table '{id}' not found.");
@@ -44,7 +44,7 @@ public class TableService
         return MapToDto(table);
     }
 
-    public async Task<TableResponseDto> ReleaseAsync(Guid id, CancellationToken ct = default)
+    public async Task<TableResponseDto> ReleaseAsync(int id, CancellationToken ct = default)
     {
         var table = await _repository.GetByIdAsync(id, ct)
             ?? throw new DomainException($"Table '{id}' not found.");

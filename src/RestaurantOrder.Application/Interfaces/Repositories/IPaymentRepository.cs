@@ -4,5 +4,5 @@ namespace RestaurantOrder.Application.Interfaces.Repositories;
 
 public interface IPaymentRepository : IRepository<Payment>
 {
-    Task<Payment?> GetByOrderIdAsync(Guid orderId, CancellationToken ct = default);
+    Task<Payment?> GetByOrderIdAsync(int orderId, CancellationToken ct = default);
 }

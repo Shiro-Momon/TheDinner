@@ -3,8 +3,8 @@ using RestaurantOrder.Domain.Enums;
 namespace RestaurantOrder.Application.DTOs.Orders;
 
 public record OrderResponseDto(
-    Guid Id,
-    Guid TableId,
+    int Id,
+    int TableId,
     OrderStatus Status,
     List<OrderItemResponseDto> Items,
     decimal TotalAmount,

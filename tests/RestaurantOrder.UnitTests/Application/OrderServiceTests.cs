@@ -26,20 +26,18 @@ public class OrderServiceTests
     [Fact]
     public async Task Should_CreateOrder_When_ValidDto()
     {
-        var tableId = Guid.NewGuid();
-        var menuItemId = Guid.NewGuid();
         var menuItem = MenuItem.Create("Burger", 12m, MenuItemCategory.MainCourse);
-        var dto = new CreateOrderDto(tableId, new List<CreateOrderItemDto>
+        var dto = new CreateOrderDto(1, new List<CreateOrderItemDto>
         {
-            new(menuItemId, 2),
+            new(1, 2),
         });
 
-        _menuRepo.GetByIdAsync(menuItemId, Arg.Any<CancellationToken>())
+        _menuRepo.GetByIdAsync(1, Arg.Any<CancellationToken>())
             .Returns(menuItem);
 
         var result = await _sut.CreateAsync(dto);
 
-        result.TableId.Should().Be(tableId);
+        result.TableId.Should().Be(1);
         result.Items.Should().HaveCount(1);
         result.Status.Should().Be(OrderStatus.Pending);
         await _orderRepo.Received(1).AddAsync(Arg.Any<Order>(), Arg.Any<CancellationToken>());
@@ -48,12 +46,12 @@ public class OrderServiceTests
     [Fact]
     public async Task Should_ThrowDomainException_When_MenuItemNotFound()
     {
-        var dto = new CreateOrderDto(Guid.NewGuid(), new List<CreateOrderItemDto>
+        var dto = new CreateOrderDto(1, new List<CreateOrderItemDto>
         {
-            new(Guid.NewGuid(), 1),
+            new(99, 1),
         });
 
-        _menuRepo.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _menuRepo.GetByIdAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
             .ReturnsNull();
 
         var act = async () => await _sut.CreateAsync(dto);
@@ -65,12 +63,12 @@ public class OrderServiceTests
     public async Task Should_ThrowDomainException_When_MenuItemUnavailable()
     {
         var menuItem = MenuItem.Create("Sold Out", 5m, MenuItemCategory.Dessert, isAvailable: false);
-        var dto = new CreateOrderDto(Guid.NewGuid(), new List<CreateOrderItemDto>
+        var dto = new CreateOrderDto(1, new List<CreateOrderItemDto>
         {
-            new(menuItem.Id, 1),
+            new(1, 1),
         });
 
-        _menuRepo.GetByIdAsync(menuItem.Id, Arg.Any<CancellationToken>())
+        _menuRepo.GetByIdAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(menuItem);
 
         var act = async () => await _sut.CreateAsync(dto);
@@ -81,8 +79,8 @@ public class OrderServiceTests
     [Fact]
     public async Task Should_ConfirmOrder_When_OrderExists()
     {
-        var order = Order.Create(Guid.NewGuid());
-        order.AddItem(OrderItem.Create(Guid.NewGuid(), 1, 10m));
+        var order = Order.Create(1);
+        order.AddItem(OrderItem.Create(1, 1, 10m));
 
         _orderRepo.GetWithItemsAsync(order.Id, Arg.Any<CancellationToken>())
             .Returns(order);
@@ -96,10 +94,10 @@ public class OrderServiceTests
     [Fact]
     public async Task Should_ThrowDomainException_When_OrderNotFound()
     {
-        _orderRepo.GetWithItemsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _orderRepo.GetWithItemsAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
             .ReturnsNull();
 
-        var act = async () => await _sut.ConfirmAsync(Guid.NewGuid());
+        var act = async () => await _sut.ConfirmAsync(99);
 
         await act.Should().ThrowAsync<DomainException>();
     }

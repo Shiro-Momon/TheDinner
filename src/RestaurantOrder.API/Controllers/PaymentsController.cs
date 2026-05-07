@@ -22,11 +22,11 @@ public class PaymentsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id, CancellationToken ct) =>
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id, CancellationToken ct) =>
         Ok(await _paymentService.GetByIdAsync(id, ct));
 
-    [HttpGet("order/{orderId:guid}")]
-    public async Task<IActionResult> GetByOrderId(Guid orderId, CancellationToken ct) =>
+    [HttpGet("order/{orderId:int}")]
+    public async Task<IActionResult> GetByOrderId(int orderId, CancellationToken ct) =>
         Ok(await _paymentService.GetByOrderIdAsync(orderId, ct));
 }

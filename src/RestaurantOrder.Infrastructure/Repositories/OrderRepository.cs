@@ -15,6 +15,6 @@ public class OrderRepository : Repository<Order>, IOrderRepository
     public async Task<IReadOnlyList<Order>> GetByStatusAsync(OrderStatus status, CancellationToken ct = default) =>
         await DbSet.Include(o => o.Items).Where(o => o.Status == status).ToListAsync(ct);
 
-    public async Task<Order?> GetWithItemsAsync(Guid orderId, CancellationToken ct = default) =>
+    public async Task<Order?> GetWithItemsAsync(int orderId, CancellationToken ct = default) =>
         await DbSet.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == orderId, ct);
 }

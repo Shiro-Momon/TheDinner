@@ -1,5 +1,5 @@
 namespace RestaurantOrder.Application.DTOs.Orders;
 
 public record CreateOrderDto(
-    Guid TableId,
+    int TableId,
     List<CreateOrderItemDto> Items);

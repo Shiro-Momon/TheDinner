@@ -75,7 +75,7 @@ public class PaymentEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Should_Return422_When_PaymentNotFound()
     {
-        var response = await _client.GetAsync($"/api/payments/{Guid.NewGuid()}");
+        var response = await _client.GetAsync("/api/payments/99999");
 
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
@@ -101,7 +101,7 @@ public class PaymentEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         return order;
     }
 
-    private async Task<PaymentResponseDto> ProcessPaymentAsync(Guid orderId, PaymentMethod method)
+    private async Task<PaymentResponseDto> ProcessPaymentAsync(int orderId, PaymentMethod method)
     {
         var response = await _client.PostAsJsonAsync("/api/payments",
             new CreatePaymentDto(orderId, method));

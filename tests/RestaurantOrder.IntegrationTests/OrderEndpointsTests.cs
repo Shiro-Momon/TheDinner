@@ -95,7 +95,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Should_Return422_When_OrderNotFound()
     {
-        var response = await _client.GetAsync($"/api/orders/{Guid.NewGuid()}");
+        var response = await _client.GetAsync("/api/orders/99999");
 
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }

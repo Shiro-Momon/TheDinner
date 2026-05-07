@@ -20,8 +20,8 @@ public class MenuController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken ct) =>
         Ok(await _menuService.GetAllAsync(ct));
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id, CancellationToken ct) =>
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id, CancellationToken ct) =>
         Ok(await _menuService.GetByIdAsync(id, ct));
 
     [HttpGet("category/{category}")]
@@ -35,12 +35,12 @@ public class MenuController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateMenuItemDto dto, CancellationToken ct) =>
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateMenuItemDto dto, CancellationToken ct) =>
         Ok(await _menuService.UpdateAsync(id, dto, ct));
 
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         await _menuService.DeleteAsync(id, ct);
         return NoContent();

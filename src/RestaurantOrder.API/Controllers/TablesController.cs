@@ -19,8 +19,8 @@ public class TablesController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken ct) =>
         Ok(await _tableService.GetAllAsync(ct));
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id, CancellationToken ct) =>
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id, CancellationToken ct) =>
         Ok(await _tableService.GetByIdAsync(id, ct));
 
     [HttpPost]
@@ -30,11 +30,11 @@ public class TablesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    [HttpPatch("{id:guid}/occupy")]
-    public async Task<IActionResult> Occupy(Guid id, CancellationToken ct) =>
+    [HttpPatch("{id:int}/occupy")]
+    public async Task<IActionResult> Occupy(int id, CancellationToken ct) =>
         Ok(await _tableService.OccupyAsync(id, ct));
 
-    [HttpPatch("{id:guid}/release")]
-    public async Task<IActionResult> Release(Guid id, CancellationToken ct) =>
+    [HttpPatch("{id:int}/release")]
+    public async Task<IActionResult> Release(int id, CancellationToken ct) =>
         Ok(await _tableService.ReleaseAsync(id, ct));
 }

@@ -9,16 +9,14 @@ namespace RestaurantOrder.UnitTests.Domain;
 public class OrderTests
 {
     private static OrderItem MakeItem(decimal price = 10m) =>
-        OrderItem.Create(Guid.NewGuid(), 1, price);
+        OrderItem.Create(1, 1, price);
 
     [Fact]
     public void Should_CreateOrder_When_ValidTableId()
     {
-        var tableId = Guid.NewGuid();
+        var order = Order.Create(1);
 
-        var order = Order.Create(tableId);
-
-        order.TableId.Should().Be(tableId);
+        order.TableId.Should().Be(1);
         order.Status.Should().Be(OrderStatus.Pending);
         order.Items.Should().BeEmpty();
     }
@@ -26,7 +24,7 @@ public class OrderTests
     [Fact]
     public void Should_AddItem_When_OrderIsPending()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         var item = MakeItem();
 
         order.AddItem(item);
@@ -38,7 +36,7 @@ public class OrderTests
     [Fact]
     public void Should_ThrowDomainException_When_AddingItemToConfirmedOrder()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         order.AddItem(MakeItem());
         order.Confirm();
 
@@ -50,11 +48,10 @@ public class OrderTests
     [Fact]
     public void Should_RemoveItem_When_OrderIsPending()
     {
-        var menuItemId = Guid.NewGuid();
-        var order = Order.Create(Guid.NewGuid());
-        order.AddItem(OrderItem.Create(menuItemId, 1, 10m));
+        var order = Order.Create(1);
+        order.AddItem(OrderItem.Create(42, 1, 10m));
 
-        order.RemoveItem(menuItemId);
+        order.RemoveItem(42);
 
         order.Items.Should().BeEmpty();
     }
@@ -62,9 +59,9 @@ public class OrderTests
     [Fact]
     public void Should_ThrowDomainException_When_RemovingNonExistentItem()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
 
-        var act = () => order.RemoveItem(Guid.NewGuid());
+        var act = () => order.RemoveItem(999);
 
         act.Should().Throw<DomainException>();
     }
@@ -72,7 +69,7 @@ public class OrderTests
     [Fact]
     public void Should_ConfirmOrder_When_HasItems()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         order.AddItem(MakeItem());
 
         order.Confirm();
@@ -84,7 +81,7 @@ public class OrderTests
     [Fact]
     public void Should_ThrowDomainException_When_ConfirmingEmptyOrder()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
 
         var act = () => order.Confirm();
 
@@ -94,7 +91,7 @@ public class OrderTests
     [Fact]
     public void Should_RaiseOrderConfirmedEvent_When_Confirmed()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         order.AddItem(MakeItem());
 
         order.Confirm();
@@ -105,7 +102,7 @@ public class OrderTests
     [Fact]
     public void Should_FollowFullLifecycle_When_ValidTransitions()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         order.AddItem(MakeItem());
 
         order.Confirm();
@@ -120,7 +117,7 @@ public class OrderTests
     [Fact]
     public void Should_ThrowInvalidOrderStatusTransitionException_When_WrongTransition()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         order.AddItem(MakeItem());
 
         var act = () => order.StartPreparing();
@@ -131,7 +128,7 @@ public class OrderTests
     [Fact]
     public void Should_MarkPaid_And_RaiseEvent_When_Served()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         order.AddItem(MakeItem(20m));
         order.Confirm();
         order.StartPreparing();
@@ -148,7 +145,7 @@ public class OrderTests
     [Fact]
     public void Should_Cancel_When_OrderIsNotPaid()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         order.AddItem(MakeItem());
         order.Confirm();
 
@@ -160,7 +157,7 @@ public class OrderTests
     [Fact]
     public void Should_ThrowDomainException_When_CancellingPaidOrder()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         order.AddItem(MakeItem());
         order.Confirm();
         order.StartPreparing();
@@ -176,7 +173,7 @@ public class OrderTests
     [Fact]
     public void Should_ClearDomainEvents_When_Called()
     {
-        var order = Order.Create(Guid.NewGuid());
+        var order = Order.Create(1);
         order.AddItem(MakeItem());
         order.Confirm();
 

@@ -45,14 +45,14 @@ public class PaymentService
         return MapToDto(payment);
     }
 
-    public async Task<PaymentResponseDto> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<PaymentResponseDto> GetByIdAsync(int id, CancellationToken ct = default)
     {
         var payment = await _paymentRepository.GetByIdAsync(id, ct)
             ?? throw new DomainException($"Payment '{id}' not found.");
         return MapToDto(payment);
     }
 
-    public async Task<PaymentResponseDto> GetByOrderIdAsync(Guid orderId, CancellationToken ct = default)
+    public async Task<PaymentResponseDto> GetByOrderIdAsync(int orderId, CancellationToken ct = default)
     {
         var payment = await _paymentRepository.GetByOrderIdAsync(orderId, ct)
             ?? throw new DomainException($"No payment found for order '{orderId}'.");

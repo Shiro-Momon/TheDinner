@@ -21,7 +21,7 @@ public class MenuService
         return items.Select(MapToDto).ToList();
     }
 
-    public async Task<MenuItemResponseDto> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<MenuItemResponseDto> GetByIdAsync(int id, CancellationToken ct = default)
     {
         var item = await _repository.GetByIdAsync(id, ct)
             ?? throw new DomainException($"Menu item '{id}' not found.");
@@ -41,7 +41,7 @@ public class MenuService
         return MapToDto(item);
     }
 
-    public async Task<MenuItemResponseDto> UpdateAsync(Guid id, UpdateMenuItemDto dto, CancellationToken ct = default)
+    public async Task<MenuItemResponseDto> UpdateAsync(int id, UpdateMenuItemDto dto, CancellationToken ct = default)
     {
         var item = await _repository.GetByIdAsync(id, ct)
             ?? throw new DomainException($"Menu item '{id}' not found.");
@@ -51,7 +51,7 @@ public class MenuService
         return MapToDto(item);
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
+    public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
         var item = await _repository.GetByIdAsync(id, ct)
             ?? throw new DomainException($"Menu item '{id}' not found.");

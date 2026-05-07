@@ -15,7 +15,7 @@ public class Repository<T> : IRepository<T> where T : class
         DbSet = context.Set<T>();
     }
 
-    public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
+    public async Task<T?> GetByIdAsync(int id, CancellationToken ct = default) =>
         await DbSet.FindAsync(new object[] { id }, ct);
 
     public async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken ct = default) =>
@@ -33,7 +33,7 @@ public class Repository<T> : IRepository<T> where T : class
         await Context.SaveChangesAsync(ct);
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
+    public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
         var entity = await GetByIdAsync(id, ct);
         if (entity is not null)
