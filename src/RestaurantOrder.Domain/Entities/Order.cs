@@ -13,8 +13,8 @@ public class Order
     {
     }
 
-    public Guid Id { get; private set; }
-    public Guid TableId { get; private set; }
+    public int Id { get; private set; }
+    public int TableId { get; private set; }
     public OrderStatus Status { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? ConfirmedAt { get; private set; }
@@ -26,11 +26,10 @@ public class Order
 
     public decimal TotalAmount => _items.Sum(i => i.SubTotal);
 
-    public static Order Create(Guid tableId)
+    public static Order Create(int tableId)
     {
         return new Order
         {
-            Id = Guid.NewGuid(),
             TableId = tableId,
             Status = OrderStatus.Pending,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -45,7 +44,7 @@ public class Order
         _items.Add(item);
     }
 
-    public void RemoveItem(Guid menuItemId)
+    public void RemoveItem(int menuItemId)
     {
         if (Status != OrderStatus.Pending)
             throw new DomainException("Items can only be removed from a pending order.");

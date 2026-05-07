@@ -31,9 +31,12 @@ public class PaymentService
             throw new DomainException($"Order '{dto.OrderId}' has already been paid.");
 
         var processor = _paymentFactory.GetProcessor(dto.Method);
-        var transactionRef = await processor.ProcessAsync(order.TotalAmount + dto.TipAmount, ct);
+        var result = await processor.ProcessAsync(order.TotalAmount + dto.TipAmount, ct);
 
-        var payment = Payment.Create(order.Id, order.TotalAmount, dto.TipAmount, dto.Method, transactionRef);
+        if (!result.IsSuccess)
+            throw new DomainException($"Payment declined: {result.FailureReason}");
+
+        var payment = Payment.Create(order.Id, order.TotalAmount, dto.TipAmount, dto.Method, result.TransactionReference!);
         await _paymentRepository.AddAsync(payment, ct);
 
         order.MarkPaid(dto.Method);

@@ -8,7 +8,7 @@ public class Table
     {
     }
 
-    public Guid Id { get; private set; }
+    public int Id { get; private set; }
     public int Number { get; private set; }
     public int Capacity { get; private set; }
     public bool IsOccupied { get; private set; }
@@ -22,7 +22,6 @@ public class Table
 
         return new Table
         {
-            Id = Guid.NewGuid(),
             Number = number,
             Capacity = capacity,
             IsOccupied = false,

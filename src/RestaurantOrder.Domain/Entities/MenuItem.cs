@@ -9,7 +9,7 @@ public class MenuItem
     {
     }
 
-    public Guid Id { get; private set; }
+    public int Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public decimal Price { get; private set; }
     public MenuItemCategory Category { get; private set; }
@@ -24,7 +24,6 @@ public class MenuItem
 
         return new MenuItem
         {
-            Id = Guid.NewGuid(),
             Name = name.Trim(),
             Price = price,
             Category = category,
