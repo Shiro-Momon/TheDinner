@@ -35,16 +35,16 @@ using (var scope = app.Services.CreateScope())
         db.Database.EnsureCreated();
     else
         db.Database.Migrate();
+
+    if (!app.Environment.IsEnvironment("Testing"))
+        await DataSeeder.SeedAsync(db);
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpMetrics();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 app.MapControllers();
 app.MapMetrics();
