@@ -48,6 +48,24 @@ jobs:
       - name: Build Docker image
         run: docker build -t restaurantorder-api:ci .
 
+      - name: Trivy — filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          exit-code: '1'
+          severity: 'CRITICAL'
+          format: 'table'
+
+      - name: Trivy — image scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          image-ref: 'restaurantorder-api:ci'
+          exit-code: '1'
+          severity: 'CRITICAL'
+          format: 'table'
+
   sonarcloud:
     runs-on: ubuntu-latest
     needs: build-and-test
