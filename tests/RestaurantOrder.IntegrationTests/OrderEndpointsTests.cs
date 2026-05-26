@@ -100,6 +100,58 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
+    [Fact]
+    public async Task Should_ReturnOkWithList_When_GetAllOrders()
+    {
+        await CreateOrderAsync();
+
+        var response = await _client.GetAsync("/api/orders");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var orders = await response.Content.ReadFromJsonAsync<List<OrderResponseDto>>();
+        orders.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Should_ReturnFilteredOrders_When_StatusQueryProvided()
+    {
+        await CreateOrderAsync();
+
+        var response = await _client.GetAsync($"/api/orders?status={OrderStatus.Pending}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var orders = await response.Content.ReadFromJsonAsync<List<OrderResponseDto>>();
+        orders.Should().NotBeNull();
+        orders!.Should().OnlyContain(o => o.Status == OrderStatus.Pending);
+    }
+
+    [Fact]
+    public async Task Should_AddItem_When_OrderIsPending()
+    {
+        var order = await CreateOrderAsync();
+        var menuItem = await CreateMenuItemAsync();
+        var dto = new AddOrderItemDto(menuItem.Id, 1);
+
+        var response = await _client.PostAsJsonAsync($"/api/orders/{order.Id}/items", dto);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+        updated!.Items.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public async Task Should_RemoveItem_When_OrderIsPending()
+    {
+        var order = await CreateOrderAsync();
+        var menuItemId = order.Items[0].MenuItemId;
+
+        var response = await _client.DeleteAsync($"/api/orders/{order.Id}/items/{menuItemId}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+        updated!.Items.Should().BeEmpty();
+    }
+
     private async Task<TableResponseDto> CreateTableAsync()
     {
         var response = await _client.PostAsJsonAsync("/api/tables", new CreateTableDto(99, 4));

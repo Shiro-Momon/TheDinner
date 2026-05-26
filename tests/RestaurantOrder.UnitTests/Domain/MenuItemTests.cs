@@ -49,4 +49,28 @@ public class MenuItemTests
         item.Price.Should().Be(14m);
         item.IsAvailable.Should().BeFalse();
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Should_ThrowDomainException_When_UpdateNameIsEmpty(string name)
+    {
+        var item = MenuItem.Create("Burger", 12.50m, MenuItemCategory.MainCourse);
+
+        var act = () => item.Update(name, 10m, MenuItemCategory.MainCourse, true);
+
+        act.Should().Throw<DomainException>();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-5)]
+    public void Should_ThrowDomainException_When_UpdatePriceIsNotPositive(decimal price)
+    {
+        var item = MenuItem.Create("Burger", 12.50m, MenuItemCategory.MainCourse);
+
+        var act = () => item.Update("Burger", price, MenuItemCategory.MainCourse, true);
+
+        act.Should().Throw<DomainException>();
+    }
 }

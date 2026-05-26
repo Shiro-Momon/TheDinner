@@ -61,4 +61,15 @@ public class PricingStrategyTests
     {
         new GroupDiscountPricingStrategy().StrategyName.Should().Be("GroupDiscount");
     }
+
+    [Fact]
+    public void Should_ReturnSumOfSubTotals_When_HappyHourStrategy()
+    {
+        var strategy = new HappyHourPricingStrategy();
+        var items = MakeItems(3, 10m);
+
+        var total = strategy.CalculateTotal(items);
+
+        total.Should().Be(30m);
+    }
 }
