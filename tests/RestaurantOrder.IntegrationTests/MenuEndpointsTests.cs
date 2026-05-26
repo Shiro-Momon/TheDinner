@@ -53,7 +53,8 @@ public class MenuEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Should_Return422_When_MenuItemNotFound()
     {
-        var response = await _client.GetAsync($"/api/menu/{Guid.NewGuid()}");
+        var response = await _client.GetAsync("/api/menu/999999");
+        //var response = await _client.GetAsync($"/api/menu/{Guid.NewGuid()}");
 
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
