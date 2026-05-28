@@ -56,3 +56,5 @@ nunit-*.xml
 # claude
 CLAUDE.md
 claude*/
+FRONTEND_CLAUDE.md
+FRONTEND_SPEC.md
