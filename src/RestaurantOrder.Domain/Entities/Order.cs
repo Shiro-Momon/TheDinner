@@ -14,7 +14,9 @@ public class Order
     }
 
     public int Id { get; private set; }
-    public int TableId { get; private set; }
+    public int? TableId { get; private set; }
+    public bool IsToGo { get; private set; }
+    public PricingStrategyType PricingStrategy { get; private set; }
     public OrderStatus Status { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? ConfirmedAt { get; private set; }
@@ -26,11 +28,16 @@ public class Order
 
     public decimal TotalAmount => _items.Sum(i => i.SubTotal);
 
-    public static Order Create(int tableId)
+    public static Order Create(int? tableId, bool isToGo, PricingStrategyType pricingStrategy)
     {
+        if (!isToGo && tableId is null)
+            throw new DomainException("A table must be specified for dine-in orders.");
+
         return new Order
         {
             TableId = tableId,
+            IsToGo = isToGo,
+            PricingStrategy = pricingStrategy,
             Status = OrderStatus.Pending,
             CreatedAt = DateTimeOffset.UtcNow,
         };

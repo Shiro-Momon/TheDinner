@@ -25,7 +25,10 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
 
-        services.AddScoped<IPricingStrategy, StandardPricingStrategy>();
+        services.AddScoped<StandardPricingStrategy>();
+        services.AddScoped<HappyHourPricingStrategy>();
+        services.AddScoped<GroupDiscountPricingStrategy>();
+        services.AddScoped<IPricingStrategyFactory, PricingStrategyFactory>();
 
         services.AddScoped<IPaymentProcessor, CashPaymentProcessor>();
         services.AddScoped<IPaymentProcessor, CreditCardPaymentProcessor>();

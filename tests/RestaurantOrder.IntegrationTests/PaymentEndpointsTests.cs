@@ -90,7 +90,7 @@ public class PaymentEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var item = (await itemResponse.Content.ReadFromJsonAsync<MenuItemResponseDto>())!;
 
         var orderResponse = await _client.PostAsJsonAsync("/api/orders",
-            new CreateOrderDto(table.Id, new List<CreateOrderItemDto> { new(item.Id, 1) }));
+            new CreateOrderDto(table.Id, false, PricingStrategyType.Standard, new List<CreateOrderItemDto> { new(item.Id, 1) }));
         var order = (await orderResponse.Content.ReadFromJsonAsync<OrderResponseDto>())!;
 
         await _client.PatchAsync($"/api/orders/{order.Id}/confirm", null);

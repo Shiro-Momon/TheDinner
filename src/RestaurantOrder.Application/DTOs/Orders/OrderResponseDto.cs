@@ -4,7 +4,9 @@ namespace RestaurantOrder.Application.DTOs.Orders;
 
 public record OrderResponseDto(
     int Id,
-    int TableId,
+    int? TableId,
+    bool IsToGo,
+    PricingStrategyType PricingStrategy,
     OrderStatus Status,
     List<OrderItemResponseDto> Items,
     decimal TotalAmount,

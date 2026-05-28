@@ -9,7 +9,9 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
     public void Configure(EntityTypeBuilder<Order> builder)
     {
         builder.HasKey(o => o.Id);
-        builder.Property(o => o.TableId).IsRequired();
+        builder.Property(o => o.TableId).IsRequired(false);
+        builder.Property(o => o.IsToGo).IsRequired();
+        builder.Property(o => o.PricingStrategy).IsRequired();
         builder.Property(o => o.Status).IsRequired();
         builder.Property(o => o.CreatedAt).IsRequired();
 

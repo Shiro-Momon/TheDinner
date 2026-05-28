@@ -9,15 +9,18 @@ public class PaymentService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IPaymentRepository _paymentRepository;
+    private readonly ITableRepository _tableRepository;
     private readonly PaymentFactory _paymentFactory;
 
     public PaymentService(
         IOrderRepository orderRepository,
         IPaymentRepository paymentRepository,
+        ITableRepository tableRepository,
         PaymentFactory paymentFactory)
     {
         _orderRepository = orderRepository;
         _paymentRepository = paymentRepository;
+        _tableRepository = tableRepository;
         _paymentFactory = paymentFactory;
     }
 
@@ -41,6 +44,16 @@ public class PaymentService
 
         order.MarkPaid(dto.Method);
         await _orderRepository.UpdateAsync(order, ct);
+
+        if (!order.IsToGo && order.TableId.HasValue)
+        {
+            var table = await _tableRepository.GetByIdAsync(order.TableId.Value, ct);
+            if (table is not null)
+            {
+                table.Release();
+                await _tableRepository.UpdateAsync(table, ct);
+            }
+        }
 
         return MapToDto(payment);
     }

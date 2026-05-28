@@ -23,7 +23,7 @@ public class DomainEventDispatcherTests
     public async Task Should_DispatchEvents_And_ClearThem_When_OrderHasEvents()
     {
         var dispatcher = new DomainEventDispatcher(BuildProvider());
-        var order = Order.Create(1);
+        var order = Order.Create(1, false, RestaurantOrder.Domain.Enums.PricingStrategyType.Standard);
         order.AddItem(OrderItem.Create(1, 1, 10m));
         order.Confirm();
         order.DomainEvents.Should().NotBeEmpty();
@@ -37,7 +37,7 @@ public class DomainEventDispatcherTests
     public async Task Should_CompleteWithoutError_When_OrderHasNoEvents()
     {
         var dispatcher = new DomainEventDispatcher(BuildProvider());
-        var order = Order.Create(1);
+        var order = Order.Create(1, false, RestaurantOrder.Domain.Enums.PricingStrategyType.Standard);
 
         var act = async () => await dispatcher.DispatchAsync(order);
 

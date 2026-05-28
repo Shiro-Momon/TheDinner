@@ -23,7 +23,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var table = await CreateTableAsync();
         var menuItem = await CreateMenuItemAsync();
 
-        var dto = new CreateOrderDto(table.Id, new List<CreateOrderItemDto>
+        var dto = new CreateOrderDto(table.Id, false, PricingStrategyType.Standard, new List<CreateOrderItemDto>
         {
             new(menuItem.Id, 2),
         });
@@ -168,7 +168,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     {
         var table = await CreateTableAsync();
         var menuItem = await CreateMenuItemAsync();
-        var dto = new CreateOrderDto(table.Id, new List<CreateOrderItemDto> { new(menuItem.Id, 1) });
+        var dto = new CreateOrderDto(table.Id, false, PricingStrategyType.Standard, new List<CreateOrderItemDto> { new(menuItem.Id, 1) });
         var response = await _client.PostAsJsonAsync("/api/orders", dto);
         return (await response.Content.ReadFromJsonAsync<OrderResponseDto>())!;
     }

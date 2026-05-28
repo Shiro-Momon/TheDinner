@@ -47,7 +47,7 @@ public class RepositoryTests : IDisposable
     public async Task Should_ReturnOrdersByStatus_When_GetByStatusAsync()
     {
         var repo = new OrderRepository(_context);
-        var order = Order.Create(1);
+        var order = Order.Create(1, false, PricingStrategyType.Standard);
         order.AddItem(OrderItem.Create(1, 1, 10m));
         await repo.AddAsync(order);
 

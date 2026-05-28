@@ -8,13 +8,16 @@ namespace RestaurantOrder.UnitTests.Domain;
 
 public class OrderTests
 {
+    private static Order MakeOrder() =>
+        Order.Create(1, false, PricingStrategyType.Standard);
+
     private static OrderItem MakeItem(decimal price = 10m) =>
         OrderItem.Create(1, 1, price);
 
     [Fact]
     public void Should_CreateOrder_When_ValidTableId()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
 
         order.TableId.Should().Be(1);
         order.Status.Should().Be(OrderStatus.Pending);
@@ -24,7 +27,7 @@ public class OrderTests
     [Fact]
     public void Should_AddItem_When_OrderIsPending()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         var item = MakeItem();
 
         order.AddItem(item);
@@ -36,7 +39,7 @@ public class OrderTests
     [Fact]
     public void Should_ThrowDomainException_When_AddingItemToConfirmedOrder()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(MakeItem());
         order.Confirm();
 
@@ -48,7 +51,7 @@ public class OrderTests
     [Fact]
     public void Should_RemoveItem_When_OrderIsPending()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(OrderItem.Create(42, 1, 10m));
 
         order.RemoveItem(42);
@@ -59,7 +62,7 @@ public class OrderTests
     [Fact]
     public void Should_ThrowDomainException_When_RemovingNonExistentItem()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
 
         var act = () => order.RemoveItem(999);
 
@@ -69,7 +72,7 @@ public class OrderTests
     [Fact]
     public void Should_ConfirmOrder_When_HasItems()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(MakeItem());
 
         order.Confirm();
@@ -81,7 +84,7 @@ public class OrderTests
     [Fact]
     public void Should_ThrowDomainException_When_ConfirmingEmptyOrder()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
 
         var act = () => order.Confirm();
 
@@ -91,7 +94,7 @@ public class OrderTests
     [Fact]
     public void Should_RaiseOrderConfirmedEvent_When_Confirmed()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(MakeItem());
 
         order.Confirm();
@@ -102,7 +105,7 @@ public class OrderTests
     [Fact]
     public void Should_FollowFullLifecycle_When_ValidTransitions()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(MakeItem());
 
         order.Confirm();
@@ -117,7 +120,7 @@ public class OrderTests
     [Fact]
     public void Should_ThrowInvalidOrderStatusTransitionException_When_WrongTransition()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(MakeItem());
 
         var act = () => order.StartPreparing();
@@ -128,7 +131,7 @@ public class OrderTests
     [Fact]
     public void Should_MarkPaid_And_RaiseEvent_When_Served()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(MakeItem(20m));
         order.Confirm();
         order.StartPreparing();
@@ -145,7 +148,7 @@ public class OrderTests
     [Fact]
     public void Should_Cancel_When_OrderIsNotPaid()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(MakeItem());
         order.Confirm();
 
@@ -157,7 +160,7 @@ public class OrderTests
     [Fact]
     public void Should_ThrowDomainException_When_CancellingPaidOrder()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(MakeItem());
         order.Confirm();
         order.StartPreparing();
@@ -173,12 +176,30 @@ public class OrderTests
     [Fact]
     public void Should_ClearDomainEvents_When_Called()
     {
-        var order = Order.Create(1);
+        var order = MakeOrder();
         order.AddItem(MakeItem());
         order.Confirm();
 
         order.ClearDomainEvents();
 
         order.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Should_ThrowDomainException_When_DineInOrderHasNoTable()
+    {
+        var act = () => Order.Create(null, false, PricingStrategyType.Standard);
+
+        act.Should().Throw<DomainException>();
+    }
+
+    [Fact]
+    public void Should_CreateToGoOrder_When_NoTableProvided()
+    {
+        var order = Order.Create(null, true, PricingStrategyType.Standard);
+
+        order.IsToGo.Should().BeTrue();
+        order.TableId.Should().BeNull();
+        order.Status.Should().Be(OrderStatus.Pending);
     }
 }

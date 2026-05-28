@@ -11,16 +11,19 @@ public class OrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IMenuItemRepository _menuItemRepository;
-    private readonly IPricingStrategy _pricingStrategy;
+    private readonly ITableRepository _tableRepository;
+    private readonly IPricingStrategyFactory _pricingStrategyFactory;
 
     public OrderService(
         IOrderRepository orderRepository,
         IMenuItemRepository menuItemRepository,
-        IPricingStrategy pricingStrategy)
+        ITableRepository tableRepository,
+        IPricingStrategyFactory pricingStrategyFactory)
     {
         _orderRepository = orderRepository;
         _menuItemRepository = menuItemRepository;
-        _pricingStrategy = pricingStrategy;
+        _tableRepository = tableRepository;
+        _pricingStrategyFactory = pricingStrategyFactory;
     }
 
     public async Task<IReadOnlyList<OrderResponseDto>> GetAllAsync(OrderStatus? status = null, CancellationToken ct = default)
@@ -41,7 +44,7 @@ public class OrderService
 
     public async Task<OrderResponseDto> CreateAsync(CreateOrderDto dto, CancellationToken ct = default)
     {
-        var order = Order.Create(dto.TableId);
+        var order = Order.Create(dto.TableId, dto.IsToGo, dto.PricingStrategy);
 
         foreach (var itemDto in dto.Items)
         {
@@ -55,6 +58,15 @@ public class OrderService
         }
 
         await _orderRepository.AddAsync(order, ct);
+
+        if (!dto.IsToGo && dto.TableId.HasValue)
+        {
+            var table = await _tableRepository.GetByIdAsync(dto.TableId.Value, ct)
+                ?? throw new DomainException($"Table '{dto.TableId}' not found.");
+            table.Occupy();
+            await _tableRepository.UpdateAsync(table, ct);
+        }
+
         return MapToDto(order);
     }
 
@@ -96,8 +108,26 @@ public class OrderService
     public async Task<OrderResponseDto> ServeAsync(int id, CancellationToken ct = default) =>
         await TransitionAsync(id, o => o.Serve(), ct);
 
-    public async Task<OrderResponseDto> CancelAsync(int id, CancellationToken ct = default) =>
-        await TransitionAsync(id, o => o.Cancel(), ct);
+    public async Task<OrderResponseDto> CancelAsync(int id, CancellationToken ct = default)
+    {
+        var order = await _orderRepository.GetWithItemsAsync(id, ct)
+            ?? throw new DomainException($"Order '{id}' not found.");
+
+        order.Cancel();
+        await _orderRepository.UpdateAsync(order, ct);
+
+        if (!order.IsToGo && order.TableId.HasValue)
+        {
+            var table = await _tableRepository.GetByIdAsync(order.TableId.Value, ct);
+            if (table is not null)
+            {
+                table.Release();
+                await _tableRepository.UpdateAsync(table, ct);
+            }
+        }
+
+        return MapToDto(order);
+    }
 
     private async Task<OrderResponseDto> TransitionAsync(int id, Action<Order> transition, CancellationToken ct)
     {
@@ -113,6 +143,8 @@ public class OrderService
         new(
             order.Id,
             order.TableId,
+            order.IsToGo,
+            order.PricingStrategy,
             order.Status,
             order.Items.Select(i => new OrderItemResponseDto(
                 i.Id, i.MenuItemId, i.Quantity, i.UnitPrice, i.SubTotal, i.SpecialInstructions)).ToList(),
