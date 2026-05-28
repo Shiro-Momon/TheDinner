@@ -20,7 +20,7 @@ public class TableEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync("/api/tables");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var tables = await response.Content.ReadFromJsonAsync<List<TableResponseDto>>();
+        var tables = await response.Content.ReadFromJsonAsync<List<TableResponseDto>>(TestJsonOptions.Default);
         tables.Should().NotBeNull();
     }
 
@@ -30,7 +30,7 @@ public class TableEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PostAsJsonAsync("/api/tables", new CreateTableDto(1, 4));
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var table = await response.Content.ReadFromJsonAsync<TableResponseDto>();
+        var table = await response.Content.ReadFromJsonAsync<TableResponseDto>(TestJsonOptions.Default);
         table!.Number.Should().Be(1);
         table.Capacity.Should().Be(4);
         table.IsOccupied.Should().BeFalse();
@@ -44,7 +44,7 @@ public class TableEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync($"/api/tables/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var table = await response.Content.ReadFromJsonAsync<TableResponseDto>();
+        var table = await response.Content.ReadFromJsonAsync<TableResponseDto>(TestJsonOptions.Default);
         table!.Id.Should().Be(created.Id);
     }
 
@@ -80,7 +80,7 @@ public class TableEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PatchAsync($"/api/tables/{created.Id}/occupy", null);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var table = await response.Content.ReadFromJsonAsync<TableResponseDto>();
+        var table = await response.Content.ReadFromJsonAsync<TableResponseDto>(TestJsonOptions.Default);
         table!.IsOccupied.Should().BeTrue();
     }
 
@@ -93,13 +93,13 @@ public class TableEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PatchAsync($"/api/tables/{created.Id}/release", null);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var table = await response.Content.ReadFromJsonAsync<TableResponseDto>();
+        var table = await response.Content.ReadFromJsonAsync<TableResponseDto>(TestJsonOptions.Default);
         table!.IsOccupied.Should().BeFalse();
     }
 
     private async Task<TableResponseDto> CreateTableAsync(int number, int capacity)
     {
         var response = await _client.PostAsJsonAsync("/api/tables", new CreateTableDto(number, capacity));
-        return (await response.Content.ReadFromJsonAsync<TableResponseDto>())!;
+        return (await response.Content.ReadFromJsonAsync<TableResponseDto>(TestJsonOptions.Default))!;
     }
 }

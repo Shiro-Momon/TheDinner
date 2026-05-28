@@ -31,7 +31,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PostAsJsonAsync("/api/orders", dto);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var order = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+        var order = await response.Content.ReadFromJsonAsync<OrderResponseDto>(TestJsonOptions.Default);
         order!.TableId.Should().Be(table.Id);
         order.Status.Should().Be(OrderStatus.Pending);
         order.Items.Should().HaveCount(1);
@@ -45,7 +45,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PatchAsync($"/api/orders/{order.Id}/confirm", null);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>(TestJsonOptions.Default);
         updated!.Status.Should().Be(OrderStatus.Confirmed);
     }
 
@@ -76,7 +76,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
             .Should().Be(HttpStatusCode.OK);
 
         var response = await _client.GetAsync($"/api/orders/{id}");
-        var final = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+        var final = await response.Content.ReadFromJsonAsync<OrderResponseDto>(TestJsonOptions.Default);
         final!.Status.Should().Be(OrderStatus.Served);
     }
 
@@ -88,7 +88,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PatchAsync($"/api/orders/{order.Id}/cancel", null);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>(TestJsonOptions.Default);
         updated!.Status.Should().Be(OrderStatus.Cancelled);
     }
 
@@ -108,7 +108,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync("/api/orders");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var orders = await response.Content.ReadFromJsonAsync<List<OrderResponseDto>>();
+        var orders = await response.Content.ReadFromJsonAsync<List<OrderResponseDto>>(TestJsonOptions.Default);
         orders.Should().NotBeNull();
     }
 
@@ -120,7 +120,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync($"/api/orders?status={OrderStatus.Pending}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var orders = await response.Content.ReadFromJsonAsync<List<OrderResponseDto>>();
+        var orders = await response.Content.ReadFromJsonAsync<List<OrderResponseDto>>(TestJsonOptions.Default);
         orders.Should().NotBeNull();
         orders!.Should().OnlyContain(o => o.Status == OrderStatus.Pending);
     }
@@ -135,7 +135,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PostAsJsonAsync($"/api/orders/{order.Id}/items", dto);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>(TestJsonOptions.Default);
         updated!.Items.Should().HaveCount(2);
     }
 
@@ -148,20 +148,21 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.DeleteAsync($"/api/orders/{order.Id}/items/{menuItemId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>();
+        var updated = await response.Content.ReadFromJsonAsync<OrderResponseDto>(TestJsonOptions.Default);
         updated!.Items.Should().BeEmpty();
     }
 
     private async Task<TableResponseDto> CreateTableAsync()
     {
-        var response = await _client.PostAsJsonAsync("/api/tables", new CreateTableDto(99, 4));
-        return (await response.Content.ReadFromJsonAsync<TableResponseDto>())!;
+        var number = Random.Shared.Next(10_000, 99_999);
+        var response = await _client.PostAsJsonAsync("/api/tables", new CreateTableDto(number, 4));
+        return (await response.Content.ReadFromJsonAsync<TableResponseDto>(TestJsonOptions.Default))!;
     }
 
     private async Task<MenuItemResponseDto> CreateMenuItemAsync()
     {
         var response = await _client.PostAsJsonAsync("/api/menu", new CreateMenuItemDto("Test Item", 10m, MenuItemCategory.MainCourse));
-        return (await response.Content.ReadFromJsonAsync<MenuItemResponseDto>())!;
+        return (await response.Content.ReadFromJsonAsync<MenuItemResponseDto>(TestJsonOptions.Default))!;
     }
 
     private async Task<OrderResponseDto> CreateOrderAsync()
@@ -170,6 +171,6 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var menuItem = await CreateMenuItemAsync();
         var dto = new CreateOrderDto(table.Id, false, PricingStrategyType.Standard, new List<CreateOrderItemDto> { new(menuItem.Id, 1) });
         var response = await _client.PostAsJsonAsync("/api/orders", dto);
-        return (await response.Content.ReadFromJsonAsync<OrderResponseDto>())!;
+        return (await response.Content.ReadFromJsonAsync<OrderResponseDto>(TestJsonOptions.Default))!;
     }
 }

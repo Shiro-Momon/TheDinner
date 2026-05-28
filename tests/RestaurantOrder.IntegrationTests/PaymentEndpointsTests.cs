@@ -27,7 +27,7 @@ public class PaymentEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PostAsJsonAsync("/api/payments", dto);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var payment = await response.Content.ReadFromJsonAsync<PaymentResponseDto>();
+        var payment = await response.Content.ReadFromJsonAsync<PaymentResponseDto>(TestJsonOptions.Default);
         payment!.OrderId.Should().Be(order.Id);
         payment.Method.Should().Be(PaymentMethod.Cash);
         payment.TipAmount.Should().Be(2m);
@@ -43,7 +43,7 @@ public class PaymentEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync($"/api/payments/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var payment = await response.Content.ReadFromJsonAsync<PaymentResponseDto>();
+        var payment = await response.Content.ReadFromJsonAsync<PaymentResponseDto>(TestJsonOptions.Default);
         payment!.Id.Should().Be(created.Id);
     }
 
@@ -56,7 +56,7 @@ public class PaymentEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync($"/api/payments/order/{order.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var payment = await response.Content.ReadFromJsonAsync<PaymentResponseDto>();
+        var payment = await response.Content.ReadFromJsonAsync<PaymentResponseDto>(TestJsonOptions.Default);
         payment!.OrderId.Should().Be(order.Id);
     }
 
@@ -82,16 +82,17 @@ public class PaymentEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 
     private async Task<OrderResponseDto> CreateServedOrderAsync()
     {
-        var tableResponse = await _client.PostAsJsonAsync("/api/tables", new CreateTableDto(50, 4));
-        var table = (await tableResponse.Content.ReadFromJsonAsync<TableResponseDto>())!;
+        var tableNumber = Random.Shared.Next(10_000, 99_999);
+        var tableResponse = await _client.PostAsJsonAsync("/api/tables", new CreateTableDto(tableNumber, 4));
+        var table = (await tableResponse.Content.ReadFromJsonAsync<TableResponseDto>(TestJsonOptions.Default))!;
 
         var itemResponse = await _client.PostAsJsonAsync("/api/menu",
             new CreateMenuItemDto("Payment Test Item", 15m, MenuItemCategory.MainCourse));
-        var item = (await itemResponse.Content.ReadFromJsonAsync<MenuItemResponseDto>())!;
+        var item = (await itemResponse.Content.ReadFromJsonAsync<MenuItemResponseDto>(TestJsonOptions.Default))!;
 
         var orderResponse = await _client.PostAsJsonAsync("/api/orders",
             new CreateOrderDto(table.Id, false, PricingStrategyType.Standard, new List<CreateOrderItemDto> { new(item.Id, 1) }));
-        var order = (await orderResponse.Content.ReadFromJsonAsync<OrderResponseDto>())!;
+        var order = (await orderResponse.Content.ReadFromJsonAsync<OrderResponseDto>(TestJsonOptions.Default))!;
 
         await _client.PatchAsync($"/api/orders/{order.Id}/confirm", null);
         await _client.PatchAsync($"/api/orders/{order.Id}/prepare", null);
@@ -105,6 +106,6 @@ public class PaymentEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     {
         var response = await _client.PostAsJsonAsync("/api/payments",
             new CreatePaymentDto(orderId, method));
-        return (await response.Content.ReadFromJsonAsync<PaymentResponseDto>())!;
+        return (await response.Content.ReadFromJsonAsync<PaymentResponseDto>(TestJsonOptions.Default))!;
     }
 }

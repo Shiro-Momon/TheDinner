@@ -21,7 +21,7 @@ public class MenuEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync("/api/menu");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var items = await response.Content.ReadFromJsonAsync<List<MenuItemResponseDto>>();
+        var items = await response.Content.ReadFromJsonAsync<List<MenuItemResponseDto>>(TestJsonOptions.Default);
         items.Should().NotBeNull();
     }
 
@@ -33,7 +33,7 @@ public class MenuEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PostAsJsonAsync("/api/menu", dto);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var item = await response.Content.ReadFromJsonAsync<MenuItemResponseDto>();
+        var item = await response.Content.ReadFromJsonAsync<MenuItemResponseDto>(TestJsonOptions.Default);
         item!.Name.Should().Be("Burger");
         item.Price.Should().Be(12.50m);
     }
@@ -46,7 +46,7 @@ public class MenuEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync($"/api/menu/{created.Id}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var item = await response.Content.ReadFromJsonAsync<MenuItemResponseDto>();
+        var item = await response.Content.ReadFromJsonAsync<MenuItemResponseDto>(TestJsonOptions.Default);
         item!.Id.Should().Be(created.Id);
     }
 
@@ -67,7 +67,7 @@ public class MenuEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PutAsJsonAsync($"/api/menu/{created.Id}", updateDto);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<MenuItemResponseDto>();
+        var updated = await response.Content.ReadFromJsonAsync<MenuItemResponseDto>(TestJsonOptions.Default);
         updated!.Name.Should().Be("NewName");
         updated.IsAvailable.Should().BeFalse();
     }
@@ -92,13 +92,13 @@ public class MenuEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync($"/api/menu/category/{MenuItemCategory.Beverage}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var items = await response.Content.ReadFromJsonAsync<List<MenuItemResponseDto>>();
+        var items = await response.Content.ReadFromJsonAsync<List<MenuItemResponseDto>>(TestJsonOptions.Default);
         items!.Should().OnlyContain(i => i.Category == MenuItemCategory.Beverage);
     }
 
     private async Task<MenuItemResponseDto> CreateMenuItemAsync(string name, decimal price, MenuItemCategory category)
     {
         var response = await _client.PostAsJsonAsync("/api/menu", new CreateMenuItemDto(name, price, category));
-        return (await response.Content.ReadFromJsonAsync<MenuItemResponseDto>())!;
+        return (await response.Content.ReadFromJsonAsync<MenuItemResponseDto>(TestJsonOptions.Default))!;
     }
 }
