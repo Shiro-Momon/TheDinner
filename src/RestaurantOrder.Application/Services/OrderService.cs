@@ -44,7 +44,7 @@ public class OrderService
 
     public async Task<OrderResponseDto> CreateAsync(CreateOrderDto dto, CancellationToken ct = default)
     {
-        var order = Order.Create(dto.TableId, dto.IsToGo, dto.PricingStrategy);
+        var order = Order.Create(dto.TableId, dto.IsToGo, dto.PricingStrategy, dto.CustomerName);
 
         foreach (var itemDto in dto.Items)
         {
@@ -56,6 +56,9 @@ public class OrderService
 
             order.AddItem(OrderItem.Create(menuItem.Id, itemDto.Quantity, menuItem.Price, itemDto.SpecialInstructions));
         }
+
+        var strategy = _pricingStrategyFactory.GetStrategy(dto.PricingStrategy);
+        order.SetFinalTotal(strategy.CalculateTotal(order.Items));
 
         await _orderRepository.AddAsync(order, ct);
 
@@ -145,6 +148,7 @@ public class OrderService
             order.TableId,
             order.IsToGo,
             order.PricingStrategy,
+            order.CustomerName,
             order.Status,
             order.Items.Select(i => new OrderItemResponseDto(
                 i.Id, i.MenuItemId, i.Quantity, i.UnitPrice, i.SubTotal, i.SpecialInstructions)).ToList(),

@@ -12,6 +12,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.TableId).IsRequired(false);
         builder.Property(o => o.IsToGo).IsRequired();
         builder.Property(o => o.PricingStrategy).IsRequired();
+        builder.Property(o => o.FinalTotal).IsRequired(false);
+        builder.Property(o => o.CustomerName).IsRequired(false).HasMaxLength(100);
         builder.Property(o => o.Status).IsRequired();
         builder.Property(o => o.CreatedAt).IsRequired();
 

@@ -7,6 +7,7 @@ public record OrderResponseDto(
     int? TableId,
     bool IsToGo,
     PricingStrategyType PricingStrategy,
+    string? CustomerName,
     OrderStatus Status,
     List<OrderItemResponseDto> Items,
     decimal TotalAmount,

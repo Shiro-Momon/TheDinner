@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RestaurantOrder.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using RestaurantOrder.Infrastructure.Persistence;
 namespace RestaurantOrder.Infrastructure.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
-    partial class RestaurantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260528221258_ApplyPricingStrategyTotal")]
+    partial class ApplyPricingStrategyTotal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,10 +66,6 @@ namespace RestaurantOrder.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CustomerName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<decimal?>("FinalTotal")
                         .HasColumnType("numeric");

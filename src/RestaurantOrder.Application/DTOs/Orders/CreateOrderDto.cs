@@ -6,4 +6,5 @@ public record CreateOrderDto(
     int? TableId,
     bool IsToGo,
     PricingStrategyType PricingStrategy,
-    List<CreateOrderItemDto> Items);
+    List<CreateOrderItemDto> Items,
+    string? CustomerName = null);
