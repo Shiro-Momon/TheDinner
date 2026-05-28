@@ -28,7 +28,7 @@ Les clients passent commande via une interface web (voir [The-Dinner-Front](../T
 | Linting | `dotnet format` + StyleCop + `.editorconfig` | Cohérence du style, vérifiable en CI |
 | Logging | Serilog (JSON structuré) | Corrélation par propriétés, compatible avec les agrégateurs de logs |
 | Monitoring | prometheus-net + Grafana | Métriques exposées sur `/metrics`, dashboard provisionné automatiquement |
-| Conteneur | Docker multi-stage + docker-compose | Image runtime minimale (~200 MB), orchestration locale complète |
+| Conteneur | Docker multi-stage Alpine + docker-compose | Images Alpine : runtime API ~100 MB, frontend ~70 MB — orchestration locale complète (API + frontend + BDD + monitoring) |
 | Qualité | SonarCloud + Dependabot | Analyse statique continue, alertes de vulnérabilités |
 | Sécurité | Trivy (FS + image) | Détection de CVE critiques dans le filesystem et l'image Docker |
 
@@ -88,7 +88,7 @@ Pending ──► Confirmed ──► Preparing ──► Ready ──► Served
 - [Docker](https://www.docker.com/) ≥ 24
 - [docker-compose](https://docs.docker.com/compose/) v2
 
-### Démarrage complet (API + PostgreSQL + Prometheus + Grafana)
+### Démarrage complet (API + Frontend + PostgreSQL + Prometheus + Grafana)
 
 ```bash
 git clone https://github.com/Shiro-Momon/TheDinner.git
@@ -96,14 +96,18 @@ cd TheDinner
 docker-compose up --build
 ```
 
-| Service | URL |
-|---------|-----|
-| API REST | http://localhost:8080 |
-| Scalar (docs interactives) | http://localhost:8080/scalar |
-| Health check | http://localhost:8080/health |
-| Métriques Prometheus | http://localhost:8080/metrics |
-| Prometheus UI | http://localhost:9090 |
-| Grafana | http://localhost:3000 (admin / admin) |
+| Service | URL | Image |
+|---------|-----|-------|
+| Frontend (Next.js) | http://localhost:3001 | `node:20-alpine` ~70 MB |
+| API REST | http://localhost:8080 | `aspnet:9.0-alpine` ~100 MB |
+| Scalar (docs interactives) | http://localhost:8080/scalar | — |
+| Health check | http://localhost:8080/health | — |
+| Métriques Prometheus | http://localhost:8080/metrics | — |
+| Prometheus UI | http://localhost:9090 | `prom/prometheus:v2.51.0` |
+| Grafana | http://localhost:3000 (admin / admin) | `grafana/grafana:10.4.2` |
+
+> **Premier build du frontend :** Docker clone le dépôt [The-Dinner-Front](https://github.com/Shiro-Momon/The-Dinner-Front) et installe les dépendances npm (~3–5 min). Les builds suivants utilisent le cache Docker.  
+> Pour forcer une mise à jour du frontend : `docker-compose build --no-cache frontend`
 
 ### Sans Docker (développement)
 
