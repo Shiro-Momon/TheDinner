@@ -93,7 +93,7 @@ public class OrderService
         order.AddItem(OrderItem.Create(menuItem.Id, dto.Quantity, menuItem.Price, dto.SpecialInstructions));
         await UpdateOrderTotalAsync(order, ct);
         await _orderRepository.UpdateAsync(order, ct);
-        
+
         var menuItems = await _menuItemRepository.GetAllAsync(ct);
         var nameMap = menuItems.ToDictionary(m => m.Id, m => m.Name);
         return MapToDto(order, nameMap);
@@ -107,7 +107,7 @@ public class OrderService
         order.RemoveItem(menuItemId);
         await UpdateOrderTotalAsync(order, ct);
         await _orderRepository.UpdateAsync(order, ct);
-        
+
         var menuItems = await _menuItemRepository.GetAllAsync(ct);
         var nameMap = menuItems.ToDictionary(m => m.Id, m => m.Name);
         return MapToDto(order, nameMap);
@@ -165,7 +165,7 @@ public class OrderService
 
         transition(order);
         await _orderRepository.UpdateAsync(order, ct);
-        
+
         var menuItems = await _menuItemRepository.GetAllAsync(ct);
         var nameMap = menuItems.ToDictionary(m => m.Id, m => m.Name);
         return MapToDto(order, nameMap);
