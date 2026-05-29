@@ -7,4 +7,5 @@ public record MenuItemResponseDto(
     string Name,
     decimal Price,
     MenuItemCategory Category,
-    bool IsAvailable);
+    bool IsAvailable,
+    string? ImageUrl);

@@ -13,5 +13,6 @@ public class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
         builder.Property(m => m.Price).IsRequired().HasPrecision(10, 2);
         builder.Property(m => m.Category).IsRequired();
         builder.Property(m => m.IsAvailable).IsRequired();
+        builder.Property(m => m.ImageUrl).HasMaxLength(500).IsRequired(false);
     }
 }

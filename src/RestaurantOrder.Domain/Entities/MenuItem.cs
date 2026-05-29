@@ -14,8 +14,9 @@ public class MenuItem
     public decimal Price { get; private set; }
     public MenuItemCategory Category { get; private set; }
     public bool IsAvailable { get; private set; }
+    public string? ImageUrl { get; private set; }
 
-    public static MenuItem Create(string name, decimal price, MenuItemCategory category, bool isAvailable = true)
+    public static MenuItem Create(string name, decimal price, MenuItemCategory category, bool isAvailable = true, string? imageUrl = null)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Menu item name cannot be empty.");
@@ -28,10 +29,11 @@ public class MenuItem
             Price = price,
             Category = category,
             IsAvailable = isAvailable,
+            ImageUrl = imageUrl,
         };
     }
 
-    public void Update(string name, decimal price, MenuItemCategory category, bool isAvailable)
+    public void Update(string name, decimal price, MenuItemCategory category, bool isAvailable, string? imageUrl = null)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Menu item name cannot be empty.");
@@ -42,5 +44,6 @@ public class MenuItem
         Price = price;
         Category = category;
         IsAvailable = isAvailable;
+        ImageUrl = imageUrl;
     }
 }

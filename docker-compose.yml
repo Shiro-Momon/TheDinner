@@ -13,12 +13,12 @@ services:
 
   frontend:
     build:
-      context: .
+      context: ../The-Dinner-Front
       dockerfile_inline: |
         FROM node:20-alpine AS builder
-        RUN apk add --no-cache libc6-compat git
+        RUN apk add --no-cache libc6-compat
         WORKDIR /app
-        RUN git clone --depth 1 https://github.com/Shiro-Momon/The-Dinner-Front.git .
+        COPY . .
         RUN npm install
         RUN sed -i 's|http://localhost:8080|http://api:8080|g' next.config.ts \
          && sed -i 's|const nextConfig: NextConfig = {|const nextConfig: NextConfig = { output: "standalone",|' next.config.ts

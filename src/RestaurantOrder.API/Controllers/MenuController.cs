@@ -1,3 +1,9 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantOrder.Application.DTOs.Menu;
 using RestaurantOrder.Application.Services;
@@ -10,10 +16,12 @@ namespace RestaurantOrder.API.Controllers;
 public class MenuController : ControllerBase
 {
     private readonly MenuService _menuService;
+    private readonly IWebHostEnvironment _env;
 
-    public MenuController(MenuService menuService)
+    public MenuController(MenuService menuService, IWebHostEnvironment env)
     {
         _menuService = menuService;
+        _env = env;
     }
 
     [HttpGet]
@@ -44,5 +52,36 @@ public class MenuController : ControllerBase
     {
         await _menuService.DeleteAsync(id, ct);
         return NoContent();
+    }
+
+    [HttpPost("images")]
+    public async Task<IActionResult> UploadImage(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest(new { error = "No file uploaded." });
+
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+        var ext = Path.GetExtension(file.FileName).ToLower();
+        if (!allowedExtensions.Contains(ext))
+            return BadRequest(new { error = "Invalid image format. Allowed: .jpg, .jpeg, .png, .webp, .gif" });
+
+        if (file.Length > 5 * 1024 * 1024)
+            return BadRequest(new { error = "File size exceeds the 5MB limit." });
+
+        var webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+        var imagesDir = Path.Combine(webRoot, "images");
+        if (!Directory.Exists(imagesDir))
+            Directory.CreateDirectory(imagesDir);
+
+        var fileName = $"{Guid.NewGuid()}{ext}";
+        var filePath = Path.Combine(imagesDir, fileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        var relativePath = $"/images/{fileName}";
+        return Ok(new { imageUrl = relativePath });
     }
 }

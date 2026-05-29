@@ -6,4 +6,5 @@ public record CreateMenuItemDto(
     string Name,
     decimal Price,
     MenuItemCategory Category,
-    bool IsAvailable = true);
+    bool IsAvailable = true,
+    string? ImageUrl = null);

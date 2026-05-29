@@ -36,7 +36,7 @@ public class MenuService
 
     public async Task<MenuItemResponseDto> CreateAsync(CreateMenuItemDto dto, CancellationToken ct = default)
     {
-        var item = MenuItem.Create(dto.Name, dto.Price, dto.Category, dto.IsAvailable);
+        var item = MenuItem.Create(dto.Name, dto.Price, dto.Category, dto.IsAvailable, dto.ImageUrl);
         await _repository.AddAsync(item, ct);
         return MapToDto(item);
     }
@@ -46,7 +46,7 @@ public class MenuService
         var item = await _repository.GetByIdAsync(id, ct)
             ?? throw new DomainException($"Menu item '{id}' not found.");
 
-        item.Update(dto.Name, dto.Price, dto.Category, dto.IsAvailable);
+        item.Update(dto.Name, dto.Price, dto.Category, dto.IsAvailable, dto.ImageUrl);
         await _repository.UpdateAsync(item, ct);
         return MapToDto(item);
     }
@@ -59,5 +59,5 @@ public class MenuService
     }
 
     private static MenuItemResponseDto MapToDto(MenuItem item) =>
-        new(item.Id, item.Name, item.Price, item.Category, item.IsAvailable);
+        new(item.Id, item.Name, item.Price, item.Category, item.IsAvailable, item.ImageUrl);
 }
