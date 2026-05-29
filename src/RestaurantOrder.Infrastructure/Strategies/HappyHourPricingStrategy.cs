@@ -1,3 +1,4 @@
+using System;
 using RestaurantOrder.Application.Interfaces;
 using RestaurantOrder.Domain.Entities;
 using RestaurantOrder.Domain.Enums;
@@ -11,6 +12,13 @@ public class HappyHourPricingStrategy : IPricingStrategy
 {
     public string StrategyName => "HappyHour";
 
-    public decimal CalculateTotal(IReadOnlyList<OrderItem> items) =>
-        items.Sum(i => i.SubTotal);
+    public decimal CalculateTotal(IReadOnlyList<OrderItem> items, Func<int, MenuItemCategory> getCategory)
+    {
+        return items.Sum(i =>
+        {
+            var isBeverage = getCategory(i.MenuItemId) == MenuItemCategory.Beverage;
+            var price = isBeverage ? i.UnitPrice * 0.8m : i.UnitPrice;
+            return i.Quantity * price;
+        });
+    }
 }

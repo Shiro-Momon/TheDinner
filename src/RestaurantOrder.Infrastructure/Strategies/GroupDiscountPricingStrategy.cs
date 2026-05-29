@@ -1,5 +1,7 @@
+using System;
 using RestaurantOrder.Application.Interfaces;
 using RestaurantOrder.Domain.Entities;
+using RestaurantOrder.Domain.Enums;
 
 namespace RestaurantOrder.Infrastructure.Strategies;
 
@@ -13,7 +15,7 @@ public class GroupDiscountPricingStrategy : IPricingStrategy
 
     public string StrategyName => "GroupDiscount";
 
-    public decimal CalculateTotal(IReadOnlyList<OrderItem> items)
+    public decimal CalculateTotal(IReadOnlyList<OrderItem> items, Func<int, MenuItemCategory> getCategory)
     {
         var subtotal = items.Sum(i => i.SubTotal);
         var totalQuantity = items.Sum(i => i.Quantity);
